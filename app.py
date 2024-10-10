@@ -13,17 +13,17 @@ SCOPES = ['https://www.googleapis.com/auth/drive.file']
 def upload_to_drive(file_path):
     creds = None
 
-    if os.path.exists("Recadastramento\\Ftoken.json"):
-        creds = Credentials.from_authorized_user_file("Recadastramento\\Ftoken.json", SCOPES)
+    if os.path.exists("Ftoken.json"):
+        creds = Credentials.from_authorized_user_file("Ftoken.json", SCOPES)
 
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file("Recadastramento\\credentials.json", SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
             creds = flow.run_local_server(port=0)
 
-        with open("Recadastramento\\Ftoken.json", 'w') as token:
+        with open("Ftoken.json", 'w') as token:
             token.write(creds.to_json())
 
     service = build('drive', 'v3', credentials=creds)
