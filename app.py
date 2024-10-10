@@ -93,6 +93,7 @@ def index():
             .then(data => {
                 document.getElementById('result').innerHTML = `
                     <p>Arquivo enviado com sucesso!</p>
+                    <p>Link da foto: ${data.link_foto}</p>
                     <p><a href="${data.link}" target="_blank">Ver imagem</a></p>
                 `;
             })
