@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request
+from flask import Flask, request, render_template
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -42,6 +42,10 @@ def upload_to_drive(file_path):
 
     link_foto = f"https://drive.google.com/thumbnail?sz=w500&id={file_id}"
     return link_foto
+
+@app.route('/')
+def index():
+    return render_template('upload.html')
 
 @app.route('/upload', methods=['POST'])
 def upload():
