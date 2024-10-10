@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload de Imagem</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Upload de Imagem para o Google Drive</h1>
+<form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="file" accept="image/jpeg" required>
+    <button type="submit">Enviar</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+    document.getElementById('uploadForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro ao fazer upload');
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('result').innerHTML = `
+                <p>Arquivo enviado com sucesso!</p>
+                <p><a href="${data.link}" target="_blank">Ver imagem</a></p>
+            `;
+        })
+        .catch(error => {
+            document.getElementById('result').innerHTML = `<p>${error.message}</p>`;
+        });
+    });
+</script>
+
+</body>
+</html>
