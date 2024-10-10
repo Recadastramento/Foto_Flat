@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, redirect, url_for, render_template
+from flask import Flask, request
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -9,8 +9,10 @@ from googleapiclient.http import MediaFileUpload
 app = Flask(__name__)
 
 SCOPES = ['https://www.googleapis.com/auth/drive.file']
+link_foto = ""
 
 def upload_to_drive(file_path):
+    global link_foto
     creds = None
 
     if os.path.exists("Ftoken.json"):
@@ -38,25 +40,23 @@ def upload_to_drive(file_path):
         body={'type': 'anyone', 'role': 'reader'}
     ).execute()
 
-    return f"https://drive.google.com/thumbnail?sz=w500&id={file_id}"
+    link_foto = f"https://drive.google.com/thumbnail?sz=w500&id={file_id}"
+    return link_foto
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            return 'Nenhum arquivo enviado.'
-        
-        file = request.files['file']
-        if file.filename == '':
-            return 'Nenhum arquivo selecionado.'
-        
-        file_path = os.path.join('uploads', file.filename)
-        file.save(file_path)
-        
-        link = upload_to_drive(file_path)
-        return f'Arquivo enviado com sucesso! Link: <a href="{link}">{link}</a>'
+@app.route('/upload', methods=['POST'])
+def upload():
+    if 'file' not in request.files:
+        return 'Nenhum arquivo enviado.', 400
     
-    return render_template('index.html')
+    file = request.files['file']
+    if file.filename == '':
+        return 'Nenhum arquivo selecionado.', 400
+    
+    file_path = os.path.join('uploads', file.filename)
+    file.save(file_path)
+    
+    link = upload_to_drive(file_path)
+    return {'link': link}
 
 if __name__ == '__main__':
     os.makedirs('uploads', exist_ok=True)
